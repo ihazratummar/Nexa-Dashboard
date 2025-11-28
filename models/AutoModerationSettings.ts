@@ -26,6 +26,8 @@ export interface IAutoModerationSettingsFrontend {
         ignored_channels: string[];
         ignored_roles: string[];
         twitch_only_channels: string[];
+        media_only_channels: string[];
+        youtube_only_channels: string[];
     };
     automod_rules: {
         threshold: number;

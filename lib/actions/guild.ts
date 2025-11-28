@@ -129,10 +129,13 @@ export async function getGuildChannels(guildId: string) {
 
         if (!response.ok) return [];
         const channels = await response.json();
-        // Filter for text channels (0) and maybe voice (2) if needed
-        return channels
-            .filter((c: any) => c.type === 0 || c.type === 2)
-            .map((c: any) => ({ id: c.id, name: c.name, type: c.type }));
+        // Return all channels so we can filter/count them in the UI or service layer
+        return channels.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            type: c.type,
+            parent_id: c.parent_id
+        }));
     } catch (error) {
         console.error("Error fetching channels:", error);
         return [];

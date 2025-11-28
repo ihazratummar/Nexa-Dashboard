@@ -1,6 +1,8 @@
 import { getGuildDetails } from "@/lib/discord";
+import { getGuildChannels, getGuildRoles } from "@/lib/actions/guild";
+import ServerStats from "@/components/dashboard/ServerStats";
 import { redirect } from "next/navigation";
-import { Users, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export default async function ServerOverviewPage({ params }: { params: Promise<{ guildId: string }> }) {
     const { guildId } = await params;
@@ -10,11 +12,20 @@ export default async function ServerOverviewPage({ params }: { params: Promise<{
         redirect("/dashboard");
     }
 
+    const [channels, roles] = await Promise.all([
+        getGuildChannels(guildId),
+        getGuildRoles(guildId)
+    ]);
+
+    const textChannels = channels.filter((c: any) => c.type === 0).length;
+    const voiceChannels = channels.filter((c: any) => c.type === 2).length;
+    const categories = channels.filter((c: any) => c.type === 4).length;
+
     return (
         <div>
             <h1 className="text-3xl font-bold mb-8">Overview</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {/* Server Name Card */}
                 <div className="p-6 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4">
                     {guild.icon ? (
@@ -34,17 +45,6 @@ export default async function ServerOverviewPage({ params }: { params: Promise<{
                     </div>
                 </div>
 
-                {/* Member Count Card */}
-                <div className="p-6 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center">
-                        <Users className="w-8 h-8 text-blue-400" />
-                    </div>
-                    <div>
-                        <h3 className="text-gray-400 text-sm">Total Members</h3>
-                        <p className="text-xl font-bold">{guild.approximate_member_count || 'N/A'}</p>
-                    </div>
-                </div>
-
                 {/* Verification Level Card */}
                 <div className="p-6 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -56,6 +56,15 @@ export default async function ServerOverviewPage({ params }: { params: Promise<{
                     </div>
                 </div>
             </div>
+
+            <h2 className="text-2xl font-bold mb-6">Server Statistics</h2>
+            <ServerStats
+                memberCount={guild.approximate_member_count || 0}
+                categoryCount={categories}
+                textChannelCount={textChannels}
+                voiceChannelCount={voiceChannels}
+                roleCount={roles.length}
+            />
         </div>
     );
 }
