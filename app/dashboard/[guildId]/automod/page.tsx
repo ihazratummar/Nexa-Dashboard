@@ -2,6 +2,7 @@ import { getGuildRoles, getGuildChannels, getGuildSettings, getBotHighestRolePos
 import { getAutoModSettings } from "@/lib/actions/automod";
 import AutoModGlobalSettings from "@/components/dashboard/automod/AutoModGlobalSettings";
 import AutoModFilterCard from "@/components/dashboard/automod/AutoModFilterCard";
+import AutoModRulesCard from "@/components/dashboard/automod/AutoModRulesCard";
 import AutoModHeader from "@/components/dashboard/automod/AutoModHeader";
 import { PREMIUM_FILTERS } from "@/lib/constants/premium";
 
@@ -40,13 +41,18 @@ export default async function AutoModPage({ params }: PageProps) {
 
             <AutoModGlobalSettings
                 settings={settings.global}
+                guildId={guildId}
                 roles={roles}
                 channels={channels}
-                guildId={guildId}
                 botHighestRolePosition={botHighestRolePosition}
             />
 
-            <div className="space-y-4">
+            <AutoModRulesCard
+                rules={settings.automod_rules || []}
+                guildId={guildId}
+            />
+
+            <div className="grid grid-cols-1 gap-6">
                 <h2 className="text-lg font-semibold text-gray-300 px-1">Filters</h2>
                 {FILTERS.map(filter => (
                     <AutoModFilterCard

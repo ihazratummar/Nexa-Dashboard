@@ -41,12 +41,12 @@ const modules = [
         items: [
             { name: "Utility", href: "/utility", icon: Wrench },
             { name: "Moderation", href: "/moderation", icon: ShieldAlert },
+            { name: "Auto Moderation", href: "/automod", icon: Shield },
             { name: "Leveling", href: "/leveling", icon: Trophy },
             { name: "Economy", href: "/economy", icon: Coins },
             { name: "Logs", href: "/logs", icon: ScrollText },
             { name: "Welcome", href: "/welcome", icon: MessageSquare },
             { name: "Auto Roles", href: "#", icon: UserCog, comingSoon: true },
-            { name: "Auto Moderation", href: "/automod", icon: Shield },
             { name: "Anti-Raid", href: "#", icon: Swords, comingSoon: true },
         ]
     },

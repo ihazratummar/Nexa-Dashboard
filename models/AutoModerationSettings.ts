@@ -25,10 +25,13 @@ export interface IAutoModerationSettingsFrontend {
         is_enabled: boolean;
         ignored_channels: string[];
         ignored_roles: string[];
-        media_only_channels: string[];
-        youtube_only_channels: string[];
         twitch_only_channels: string[];
     };
+    automod_rules: {
+        threshold: number;
+        action: string;
+        duration?: number;
+    }[];
     filters: {
         spam: IAutoModFilter;
         bad_words: IAutoModFilter;
@@ -66,6 +69,11 @@ export interface IAutoModerationSettings extends Document {
         youtube_only_channels: string[];
         twitch_only_channels: string[];
     };
+    automod_rules: {
+        threshold: number;
+        action: string;
+        duration?: number;
+    }[];
     filters: {
         spam: IAutoModFilter;
         bad_words: IAutoModFilter;
@@ -91,6 +99,12 @@ const FilterSchema = new Schema({
     custom_config: { type: Schema.Types.Mixed, default: {} }
 }, { _id: false });
 
+const AutoModRuleSchema = new Schema({
+    threshold: { type: Number, required: true },
+    action: { type: String, required: true },
+    duration: { type: Number }
+}, { _id: false });
+
 const AutoModerationSettingsSchema: Schema = new Schema(
     {
         guild_id: { type: String, required: true, unique: true },
@@ -102,6 +116,7 @@ const AutoModerationSettingsSchema: Schema = new Schema(
             youtube_only_channels: [{ type: String }],
             twitch_only_channels: [{ type: String }],
         },
+        automod_rules: { type: [AutoModRuleSchema], default: [] },
         filters: {
             spam: { type: FilterSchema, default: () => ({}) },
             bad_words: { type: FilterSchema, default: () => ({}) },
@@ -117,11 +132,18 @@ const AutoModerationSettingsSchema: Schema = new Schema(
     },
     {
         timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
-        collection: 'auto_moderation_settings'
+        collection: 'automod_settings',
+        strict: false // Allow fields not in schema (debugging persistence)
     }
 );
+
+// Force model rebuild in development to ensure schema updates are picked up
+if (process.env.NODE_ENV === 'development') {
+    delete mongoose.models.AutoModerationSettings;
+}
 
 const AutoModerationSettings: Model<IAutoModerationSettings> =
     mongoose.models.AutoModerationSettings || mongoose.model<IAutoModerationSettings>('AutoModerationSettings', AutoModerationSettingsSchema);
 
 export default AutoModerationSettings;
+// Force rebuild
